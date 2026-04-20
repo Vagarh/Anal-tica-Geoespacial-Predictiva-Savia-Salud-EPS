@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Savia Salud EPS · Analítica Geoespacial Predictiva</title>
+  <meta name="description" content="Dashboard de analítica geoespacial predictiva · Savia Salud EPS" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ══ SIDEBAR ═══════════════════════════════════════════════ -->
+<aside id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+        <circle cx="12" cy="9" r="2.5"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sb-name">Savia Salud EPS</div>
+      <div class="sb-sub">PANEL DE CONTROL</div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <a href="#" class="sb-item active" data-view="resumen" id="nav-resumen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Resumen Ejecutivo
+    </a>
+    <a href="#" class="sb-item" data-view="mapa-riesgo" id="nav-mapa-riesgo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      Mapa de Riesgo
+    </a>
+    <a href="#" class="sb-item" data-view="mapa-ips" id="nav-mapa-ips">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Red IPS & Distancias
+    </a>
+    <a href="#" class="sb-item" data-view="mapa-glosa" id="nav-mapa-glosa">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Análisis Glosas
+    </a>
+    <a href="#" class="sb-item" data-view="features" id="nav-features">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Features SHAP
+    </a>
+    <a href="#" class="sb-item" data-view="modelo" id="nav-modelo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Métricas Modelo
+    </a>
+    <a href="#" class="sb-item" data-view="prediccion" id="nav-prediccion">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Predicción Geo
+    </a>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">JC</div>
+      <div>
+        <div class="sb-uname">jcardonr</div>
+        <div class="sb-udata">11.6M facturas · 3 meses</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main id="main">
+
+  <!-- TopBar -->
+  <header id="topbar">
+    <div id="breadcrumb"><span class="bc-root">Dashboard</span> <span class="bc-sep">/</span> <span id="bc-page">Resumen Ejecutivo</span></div>
+    <div class="tb-right">
+      <div class="tb-period">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Ene – Abr 2026
+      </div>
+      <button class="tb-export">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+  </header>
+
+  <!-- ════ CONTENT ════════════════════════════════════════════ -->
+  <div id="content">
+
+    <!-- ══ VIEW: RESUMEN ══════════════════════════════════════ -->
+    <section id="view-resumen" class="view active">
+
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Tasa Global Glosa</span><div class="kpi-badge badge-red">🔴 Alerta</div></div>
+          <div class="kpi-val">6.2%</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width:62%;background:#E03131"></div></div>
+          <div class="kpi-sub">10 municipios sobre umbral crítico (13%)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Total Facturas</span><div class="kpi-badge badge-blue">Últimos 3M</div></div>
+          <div class="kpi-val">11.6<span class="kpi-unit">M</span></div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width:85%;background:#0033A0"></div></div>
+          <div class="kpi-sub">Medellín concentra 28.4% del volumen</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Municipios Cubiertos</span><div class="kpi-badge badge-yellow">Antioquia</div></div>
+          <div class="kpi-val">121</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width:95%;background:#F59F00"></div></div>
+          <div class="kpi-sub">Zonas rurales con baja densidad IPS</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">AUC-ROC Modelo</span><div class="kpi-badge badge-yellow">⚠️ Mejora</div></div>
+          <div class="kpi-val">0.662</div>
+          <div class="kpi-bar"><div class="kpi-bar-fill" style="width:66%;background:#F59F00"></div></div>
+          <div class="kpi-sub">Objetivo: ≥ 0.75 · Feature #1: glosa_rate_municipio</div>
+        </div>
+      </div>
+
+      <!-- Mini mapa + chart resumen -->
+      <div class="two-col">
+        <div class="card card-tall">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Distribución Geográfica de Riesgo</div>
+              <div class="card-sub">Antioquia · Tasa de glosa por municipio</div>
+            </div>
+            <div class="kpi-badge badge-red">🌍 Mapa en vivo</div>
+          </div>
+          <div id="mini-map" class="map-container" style="height:360px"></div>
+          <div class="map-legend">
+            <span class="leg-item"><span class="leg-dot" style="background:#E03131"></span>Crítico &gt;13%</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#F59F00"></span>Moderado 7.6-13%</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#2F9E44"></span>Bajo &lt;7.6%</span>
+          </div>
+        </div>
+        <div class="col-stack">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Distribución Target</div></div>
+            <div style="height:180px"><canvas id="chart-donut-resumen"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Municipios Alto Riesgo</div></div>
+            <div class="top-risk-list" id="top-risk-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: MAPA RIESGO ══════════════════════════════════ -->
+    <section id="view-mapa-riesgo" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Mapa de Riesgo · Glosas por Municipio</div>
+          <div class="page-sub">Tasa histórica · Calculada sobre train (anti-leakage) · Haz clic en un punto para ver detalles</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="map-toggle active" onclick="setRiskLayer('size')" id="btn-size">Por Volumen</button>
+          <button class="map-toggle" onclick="setRiskLayer('heat')" id="btn-heat">Por Tasa</button>
+        </div>
+      </div>
+
+      <div class="map-layout">
+        <div class="card map-main-card">
+          <div id="map-riesgo" class="map-container" style="height:520px"></div>
+        </div>
+        <div class="map-sidebar-panel">
+          <div class="card" style="padding:16px">
+            <div class="card-title" style="margin-bottom:12px">Municipio Seleccionado</div>
+            <div id="map-detail-panel">
+              <div class="detail-placeholder">
+                <span style="font-size:28px">📍</span>
+                <span>Haz clic en un municipio en el mapa</span>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:16px;margin-top:12px">
+            <div class="card-title" style="margin-bottom:12px">Leyenda</div>
+            <div class="legend-vertical">
+              <div class="leg-v-item"><span class="leg-dot lg" style="background:#7B0000;border:2px solid #7B0000"></span><div><div class="leg-v-label">Crítico</div><div class="leg-v-sub">&gt; 13% tasa glosa</div></div></div>
+              <div class="leg-v-item"><span class="leg-dot lg" style="background:#CC2200;border:2px solid #CC2200"></span><div><div class="leg-v-label">Alto</div><div class="leg-v-sub">10% – 13%</div></div></div>
+              <div class="leg-v-item"><span class="leg-dot lg" style="background:#F59F00;border:2px solid #F59F00"></span><div><div class="leg-v-label">Moderado</div><div class="leg-v-sub">7.6% – 10%</div></div></div>
+              <div class="leg-v-item"><span class="leg-dot lg" style="background:#2F9E44;border:2px solid #2F9E44"></span><div><div class="leg-v-label">Bajo</div><div class="leg-v-sub">&lt; 7.6%</div></div></div>
+              <div class="leg-v-sep"></div>
+              <div class="leg-v-item"><div class="leg-v-note">🟢 Tamaño del círculo = N° facturas</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla debajo del mapa -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">Ranking de Municipios — Tasa de Glosa</div>
+          <div class="card-sub">Ordenado por riesgo descendente</div>
+        </div>
+        <table class="data-table" id="tabla-riesgo-full">
+          <thead><tr><th>#</th><th>Municipio</th><th>Tasa Glosa</th><th>N° Facturas</th><th>vs Media Global</th><th>Categoría</th></tr></thead>
+          <tbody id="tbody-riesgo-full"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: MAPA IPS ══════════════════════════════════════ -->
+    <section id="view-mapa-ips" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Red de Prestadores IPS & Análisis de Distancias</div>
+          <div class="page-sub">Localización de sedes activas · Distancia afiliado → IPS asignada · Feature SHAP #3 geoespacial</div>
+        </div>
+      </div>
+
+      <div class="kpi-row" style="margin-bottom:16px">
+        <div class="kpi-card mini">
+          <div class="kpi-label">Medellín — Sedes IPS</div>
+          <div class="kpi-val sm">6,200+</div>
+          <div class="kpi-sub">Mayor concentración urbana</div>
+        </div>
+        <div class="kpi-card mini">
+          <div class="kpi-label">Distancia mediana</div>
+          <div class="kpi-val sm">~2 km</div>
+          <div class="kpi-sub">71% afiliados a &lt;5 km de su IPS</div>
+        </div>
+        <div class="kpi-card mini">
+          <div class="kpi-label">Distancia máxima</div>
+          <div class="kpi-val sm">400+ km</div>
+          <div class="kpi-sub">Cola larga · municipios rurales</div>
+        </div>
+        <div class="kpi-card mini">
+          <div class="kpi-label">SHAP importancia</div>
+          <div class="kpi-val sm">#7</div>
+          <div class="kpi-sub">distancia_afiliado_ips_km</div>
+        </div>
+      </div>
+
+      <div class="map-layout">
+        <div class="card map-main-card">
+          <div class="card-header" style="padding:12px 16px">
+            <div class="card-title">Mapa de IPS & Zonas de Cobertura</div>
+            <div style="display:flex;gap:8px">
+              <button class="map-toggle active" onclick="setIpsLayer('ips')" id="btn-ips">Sedes IPS</button>
+              <button class="map-toggle" onclick="setIpsLayer('dist')" id="btn-dist">Distancias</button>
+            </div>
+          </div>
+          <div id="map-ips" class="map-container" style="height:480px"></div>
+        </div>
+        <div class="map-sidebar-panel">
+          <div class="card" style="padding:16px">
+            <div class="card-title" style="margin-bottom:16px">Distribución de Distancias</div>
+            <canvas id="chart-dist-ips" height="200"></canvas>
+          </div>
+          <div class="card" style="padding:16px;margin-top:12px">
+            <div class="card-title" style="margin-bottom:12px">Densidad IPS Top 8</div>
+            <div id="ips-density-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: ANÁLISIS GLOSAS ══════════════════════════════ -->
+    <section id="view-mapa-glosa" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Análisis Espacial de Glosas</div>
+          <div class="page-sub">Concentración geográfica de inconsistencias · Correlación Pearson glosa_rate = 0.076</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-tall">
+          <div class="card-header">
+            <div class="card-title">Tasa Glosa vs Volumen por Municipio</div>
+            <div class="card-sub">Burbujas · color = categoría de riesgo · tamaño = N° facturas</div>
+          </div>
+          <div style="height:380px"><canvas id="chart-bubble-glosa"></canvas></div>
+        </div>
+        <div class="card card-tall">
+          <div class="card-header">
+            <div class="card-title">Mapa Glosas — Zona Norte Antioquia</div>
+            <div class="card-sub">Municipios más afectados · Foco territorial</div>
+          </div>
+          <div id="map-glosa" class="map-container" style="height:340px;border-radius:8px;overflow:hidden"></div>
+          <div class="map-legend" style="margin-top:8px">
+            <span class="leg-item"><span class="leg-dot" style="background:#7B0000"></span>Crítico &gt;13%</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#F59F00"></span>Moderado</span>
+            <span class="leg-item"><span class="leg-dot" style="background:#2F9E44"></span>Bajo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Correlaciones Features Geoespaciales</div></div>
+          <div style="height:260px"><canvas id="chart-corr-glosa"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Nivel de Atención IPS — Distribución de Facturas</div></div>
+          <div style="height:260px"><canvas id="chart-nivel-glosa"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: FEATURES ═════════════════════════════════════ -->
+    <section id="view-features" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Importancia de Features · SHAP</div>
+          <div class="page-sub">Contribución al modelo XGBoost geo_v1 · <span style="color:#E03131">■</span> Feature geoespacial &nbsp; <span style="color:#0049cb">■</span> Feature socioeconómica</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card card-tall">
+          <div class="card-header"><div class="card-title">Importancia SHAP Media |valor|</div></div>
+          <div style="height:400px"><canvas id="chart-shap-main"></canvas></div>
+        </div>
+        <div class="col-stack">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Correlación con Target (Pearson)</div></div>
+            <div style="height:200px"><canvas id="chart-corr-feat"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Hallazgos Clave</div></div>
+            <div class="findings-list">
+              <div class="finding-item finding-red">
+                <div class="finding-ico">🌍</div>
+                <div><div class="finding-title">glosa_rate_municipio — 5× más importante</div><div class="finding-desc">El territorio es el principal predictor. Pearson = 0.076, SHAP = 0.109</div></div>
+              </div>
+              <div class="finding-item finding-blue">
+                <div class="finding-ico">🏥</div>
+                <div><div class="finding-title">densidad_ips_municipio — #4 general</div><div class="finding-desc">Más sedes → más competencia → mayor tasa de glosa. Correlación positiva.</div></div>
+              </div>
+              <div class="finding-item finding-orange">
+                <div class="finding-ico">📍</div>
+                <div><div class="finding-title">distancia_afiliado_ips_km — #7</div><div class="finding-desc">Afiliados lejanos → IPS sin historial → facturación inconsistente.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: MODELO ═══════════════════════════════════════ -->
+    <section id="view-modelo" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Métricas del Modelo XGBoost geo_v1</div>
+          <div class="page-sub">Entrenado 2026-04-20 · División temporal · RANDOM_STATE=42 · 14 features</div>
+        </div>
+      </div>
+
+      <div class="warning-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div><strong>Recall Glosada = 0.0</strong> — El modelo v1 predice solo clase mayoritaria (Auditada). Fix en progreso: <code>sample_weight="balanced"</code> + train 3M muestras.</div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">AUC-ROC Validación</span><div class="kpi-badge badge-yellow">Obj. 0.75</div></div><div class="kpi-val">0.662</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:66%;background:#F59F00"></div></div></div>
+        <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">AUC-ROC Test</span><div class="kpi-badge badge-red">Shift</div></div><div class="kpi-val">0.621</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:62%;background:#E03131"></div></div></div>
+        <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">F1-macro Test</span></div><div class="kpi-val">0.323</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:32%;background:#0033A0"></div></div></div>
+        <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Recall Glosada</span><div class="kpi-badge badge-red">Bloqueado</div></div><div class="kpi-val" style="color:#E03131">0.000</div><div class="kpi-bar"><div class="kpi-bar-fill" style="width:1%;background:#E03131"></div></div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Matriz de Confusión — Test</div><div class="card-sub">Todo se predice como Auditada (0)</div></div>
+          <div class="cm-wrap">
+            <div class="cm-axis-y">Real →</div>
+            <div class="cm-grid">
+              <div class="cm-corner"></div><div class="cm-col-h">Pred. Auditada</div><div class="cm-col-h">Pred. Glosada</div><div class="cm-col-h">Pred. Devuelta</div>
+              <div class="cm-row-h">Auditada</div><div class="cm-cell high">1.00</div><div class="cm-cell zero">0.00</div><div class="cm-cell zero">0.00</div>
+              <div class="cm-row-h">Glosada</div><div class="cm-cell high">1.00</div><div class="cm-cell zero">0.00</div><div class="cm-cell zero">0.00</div>
+              <div class="cm-row-h">Devuelta</div><div class="cm-cell high">1.00</div><div class="cm-cell zero">0.00</div><div class="cm-cell zero">0.00</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Plan de Mejora — Roadmap v2</div></div>
+          <div class="roadmap">
+            <div class="rm-item rm-next"><div class="rm-num">1</div><div class="rm-body"><div class="rm-title">sample_weight="balanced"</div><div class="rm-desc">Compensar desbalance 6.2% Glosadas → Activar Recall &gt; 0</div></div><span class="rm-tag tag-next">Próximo</span></div>
+            <div class="rm-item"><div class="rm-num">2</div><div class="rm-body"><div class="rm-title">Train 3M muestras</div><div class="rm-desc">Ampliar de 1.5M estratificado</div></div><span class="rm-tag tag-pend">Pendiente</span></div>
+            <div class="rm-item"><div class="rm-num">3</div><div class="rm-body"><div class="rm-title">min_child_weight=3</div><div class="rm-desc">Mejorar captura de clases minoritarias</div></div><span class="rm-tag tag-pend">Pendiente</span></div>
+            <div class="rm-item"><div class="rm-num">4</div><div class="rm-body"><div class="rm-title">Feature NIT prestador + CIE-10</div><div class="rm-desc">Enriquecer señal por IPS específica</div></div><span class="rm-tag tag-pend">Pendiente</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ VIEW: PREDICCIÓN ═══════════════════════════════════ -->
+    <section id="view-prediccion" class="view" style="display:none">
+      <div class="map-page-header">
+        <div>
+          <div class="page-title">Predicción Geoespacial</div>
+          <div class="page-sub">Simulación de riesgo de glosa · Localización del afiliado en mapa · Modelo v1 baseline</div>
+        </div>
+      </div>
+
+      <div class="pred-layout">
+        <div class="card pred-form">
+          <div class="card-title" style="margin-bottom:20px">Perfil del Afiliado</div>
+
+          <div class="fg"><label class="fl">Municipio de Residencia</label>
+          <select id="pred-mun" class="fs" onchange="updatePredMap()">
+            <option value="medellin">Medellín (7.6%)</option>
+            <option value="bello">Bello (7.8%)</option>
+            <option value="itagui">Itagüí (7.5%)</option>
+            <option value="apartado">Apartadó (11.1%)</option>
+            <option value="carepa">Carepa (10.5%)</option>
+            <option value="caucasia">Caucasia (12.4%)</option>
+            <option value="turbo">Turbo 🔴 (13.8%)</option>
+            <option value="puerto_berrio">Puerto Berrío 🔴 (13.8%)</option>
+            <option value="angostura">Angostura 🔴 (15.5%)</option>
+            <option value="yali">Yalí 🔴 (14.0%)</option>
+            <option value="hispania">Hispania 🔴 (19.5%)</option>
+            <option value="anza">Anza 🔴 (19.5%)</option>
+            <option value="vigia">Vigía del Fuerte 🔴 (21%)</option>
+          </select></div>
+
+          <div class="fg"><label class="fl">SISBEN</label>
+          <select id="pred-sisben" class="fs">
+            <option value="1">I — Población vulnerable</option>
+            <option value="2" selected>II — Vulnerabilidad media</option>
+            <option value="3">III — Clase media baja</option>
+            <option value="4">IV — Sin focalización</option>
+          </select></div>
+
+          <div class="fg"><label class="fl">Edad: <strong id="lbl-edad">45</strong> años</label>
+          <input type="range" id="pred-edad" min="0" max="90" value="45" class="fslider" oninput="document.getElementById('lbl-edad').textContent=this.value"/></div>
+
+          <div class="fg"><label class="fl">IPS Asignada — Nivel de Atención</label>
+          <select id="pred-nivel" class="fs" onchange="updatePredMap()">
+            <option value="1" selected>Nivel 1 — Primaria</option>
+            <option value="2">Nivel 2 — Especialista</option>
+            <option value="3">Nivel 3 — Alta Complejidad</option>
+          </select></div>
+
+          <div class="fg"><label class="fl">Distancia afiliado → IPS: <strong id="lbl-dist">5</strong> km</label>
+          <input type="range" id="pred-dist" min="0" max="400" value="5" class="fslider" oninput="document.getElementById('lbl-dist').textContent=this.value;updateDistLine()"/></div>
+
+          <button class="pred-btn" onclick="ejecutarPrediccion()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Simular Predicción
+          </button>
+        </div>
+
+        <div class="pred-right">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid #eee">
+              <div class="card-title">Localización Geográfica</div>
+              <div class="card-sub">Municipio afiliado · Distancia a IPS</div>
+            </div>
+            <div id="map-pred" class="map-container" style="height:300px;border-radius:0"></div>
+          </div>
+
+          <div class="card" id="pred-result-card" style="margin-top:12px;display:none">
+            <div class="result-header">
+              <div>
+                <div class="card-title">Resultado</div>
+                <div class="result-class" id="res-class-label">—</div>
+              </div>
+              <div class="result-prob-big" id="res-prob-big">—</div>
+            </div>
+            <div class="prob-bars" id="prob-bars"></div>
+            <div class="risk-tags" id="risk-tags"></div>
+          </div>
+
+          <div class="card" id="pred-wait-card" style="margin-top:12px">
+            <div class="detail-placeholder">
+              <span style="font-size:32px">🎯</span>
+              <span>Configura el perfil y haz clic en &laquo;Simular Predicción&raquo;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

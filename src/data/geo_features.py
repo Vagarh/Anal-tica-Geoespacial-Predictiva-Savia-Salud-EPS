@@ -198,7 +198,8 @@ def compute_misma_municipio(df: pd.DataFrame) -> pd.Series:
         df["municipio_residencia"].str.strip().str.upper() ==
         df["municipio_ips"].str.strip().str.upper()
     )
-    return mismo.astype("Int64")
+    # float en lugar de Int64 nullable: XGBoost requiere float/int, no nullable Int64
+    return mismo.astype(float)
 
 
 def compute_ips_density(
@@ -377,7 +378,8 @@ def build_geo_features(
     out["hhi_dx_municipio"] = apply_hhi_dx(out, hhi_dict, global_hhi)
 
     # Features derivadas
-    out["lejos_de_ips"] = (out["distancia_afiliado_ips_km"] > distancia_alta_km).astype("Int64")
+    # float en lugar de Int64 nullable: XGBoost requiere float/int, no nullable Int64
+    out["lejos_de_ips"] = (out["distancia_afiliado_ips_km"] > distancia_alta_km).astype(float)
     out["nivel_atencion_ips"] = pd.to_numeric(
         out["nivel_atencion_ips"] if "nivel_atencion_ips" in out.columns else pd.Series(np.nan, index=out.index),
         errors="coerce",
