@@ -12,7 +12,7 @@
 
 El sistema incluye un **Dashboard Ejecutivo** interactivo basado en los datos del set de entrenamiento y validación georreferenciados en Antioquia.
 
-![Demostración interactiva de los mapas y predicciones](file:///C:/Users/jcardonr/.gemini/antigravity/brain/656f2db4-8484-452d-b821-caa9582fa6e6/savia_demo_dashboard_1776718748697.webp)
+![Demostración interactiva de los mapas y predicciones](assets/savia_demo_dashboard.webp)
 
 ---
 
