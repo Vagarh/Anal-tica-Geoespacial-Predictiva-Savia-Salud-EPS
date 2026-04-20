@@ -1,3 +1,3 @@
-Ôªøid,cm_facturas_id,estado_factura,tipo_auditoria,usuario_crea,terminal_crea,fecha_hora_crea
-1,392990,9,,jberrior (Juliana Berrio Restrepo),10.250.0.129,2021-03-23 22:26:15
-2,389756,9,,dfernanr (DIANA MAR√çA FERN√ÅNDEZ RESTREPO),10.250.0.129,2021-03-23 22:26:38
+id,cm_facturas_id,estado_factura,tipo_auditoria,usuario_crea,terminal_crea,fecha_hora_crea
+1,392990,9,,jberrior (Juliana Berrio Restrepo),localhost,2021-03-23 22:26:15
+2,389756,9,,dfernanr (DIANA MARÕA FERN¡NDEZ RESTREPO),localhost,2021-03-23 22:26:38

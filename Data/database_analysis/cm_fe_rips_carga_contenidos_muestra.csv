@@ -1,9 +1,9 @@
-ï»¿id,cm_fe_rips_cargas_id,tipo,json,xml,cuv,cuv_json,usuario_crea,terminal_crea,fecha_hora_crea
+id,cm_fe_rips_cargas_id,tipo,json,xml,cuv,cuv_json,usuario_crea,terminal_crea,fecha_hora_crea
 1,2000000,1,"{""numNota"": null, ""tipoNota"": null, ""usuarios"": [{""codSexo"": ""F"", ""servicios"": {""procedimientos"": [{""idMIPRES"": null, ""vrServicio"": 35326, ""codServicio"": 745, ""consecutivo"": 1, ""codPrestador"": ""050881081901"", ""grupoServicios"": ""02"", ""codComplicacion"": null, ""conceptoRecaudo"": ""05"", ""numAutorizacion"": null, ""codProcedimiento"": ""881201"", ""valorPagoModerador"": 0, ""fechaInicioAtencion"": ""2025-02-03 15:23"", ""numFEVPagoModerador"": null, ""codDiagnosticoPrincipal"": ""R688"", ""viaIngresoServicioSalud"": ""01"", ""finalidadTecnologiaSalud"": ""15"", ""codDiagnosticoRelacionado"": null, ""numDocumentoIdentificacion"": ""ECOC"", ""tipoDocumentoIdentificacion"": ""CC"", ""modalidadGrupoServicioTecSal"": ""01""}]}, ""consecutivo"": 1, ""incapacidad"": ""NO"", ""tipoUsuario"": ""04"", ""codPaisOrigen"": ""170"", ""fechaNacimiento"": ""1996-09-30"", ""codPaisResidencia"": ""170"", ""codMunicipioResidencia"": ""05088"", ""numDocumentoIdentificacion"": ""1040326563"", ""tipoDocumentoIdentificacion"": ""CC"", ""codZonaTerritorialResidencia"": ""02""}], ""numFactura"": ""1163809"", ""numDocumentoIdObligado"": ""900226451""}",,,,900226451r01 (ESPECIALIDADES MEDICAS METROPOLITANAS S.A),192.168.255.17,2025-02-14 10:18:31
 2,2000000,2,,,"Proceso Id: 208
 Factura: 1163809
 Fecha: martes, 4 de febrero de 2025
 Hora: 14:41:02
 Estado Proceso: Aprobado
-CÃ³digo Unico de ValidaciÃ³n (CUV): 811a7cc8ca1cdd9699be25341f7a6441bf75e2109177ff4784744343ffc9c85247838f9074451c8f25417eae834d8043
+Código Unico de Validación (CUV): 811a7cc8ca1cdd9699be25341f7a6441bf75e2109177ff4784744343ffc9c85247838f9074451c8f25417eae834d8043
 ",,900226451r01 (ESPECIALIDADES MEDICAS METROPOLITANAS S.A),192.168.255.17,2025-02-14 10:18:31
