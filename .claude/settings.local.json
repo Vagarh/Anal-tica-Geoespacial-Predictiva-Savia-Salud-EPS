@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Users/jcardonr/Documents/eafit/Codigo/**)",
+      "Read(//d/Users/jcardonr/Documents/**)"
+    ]
+  }
+}

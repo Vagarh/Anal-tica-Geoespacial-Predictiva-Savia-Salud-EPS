@@ -1,0 +1,23 @@
+# Credenciales
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Datos (nunca al repo)
+Data/raw/
+Data/processed/
+Data/interim/
+
+# Modelos serializados
+models/artifacts/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Cobertura
+.coverage
+htmlcov/

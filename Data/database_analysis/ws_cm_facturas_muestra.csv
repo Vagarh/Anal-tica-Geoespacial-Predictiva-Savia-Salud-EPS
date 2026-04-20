@@ -1,0 +1,3 @@
+﻿id,cm_radicados_id,cm_facturas_id,estado,proveedor_nit,numero_documento,numero_radicado,factura_id,regimen,valor_documento,valor_pagado,valor_glosado,valor_copago,fecha_hora_documento,fecha_hora_proceso,cuota_moderadora,contrato,impuesto_timbre,usuario_crea,terminal_crea,fecha_hora_crea
+2100,5123247,17450847,3,901249947,FE76032,460641,17450847,SUBSIDIADO,139370.0,133934.57,5435.43,0.0,2023-02-23,2023-03-13 15:04:25,,0229-2021,b'\x00',pgomezva (PAULA YECENIA GOMEZ VALENCIA),10.250.0.129,2023-03-23 08:59:28
+2101,5123246,17450566,3,901249947,FE74739,460623,17450566,SUBSIDIADO,64048.0,66082.2624,5065.7376,7100.0,2023-02-08,2023-03-13 14:56:04,,0229-2021,b'\x00',jgonzalm (JAVIER EMILIO GONZALEZ MONSALVE),10.250.0.129,2023-03-23 08:59:32
