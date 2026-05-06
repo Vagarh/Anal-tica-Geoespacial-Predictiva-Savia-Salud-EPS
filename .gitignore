@@ -21,3 +21,14 @@ models/artifacts/
 # Cobertura
 .coverage
 htmlcov/
+
+# Logs de ejecución
+*.log
+
+# Archivos de diagnóstico temporales
+diag_*.py
+test_conexion_result.txt
+
+# Node
+dashboard-next/node_modules/
+dashboard-next/.next/

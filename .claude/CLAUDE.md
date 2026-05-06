@@ -5,26 +5,65 @@
 
 ---
 
-## 0. ESTADO ACTUAL DEL PROYECTO *(Actualizado: 2026-04-20)*
+## 0. ESTADO ACTUAL DEL PROYECTO *(Actualizado: 2026-05-06)*
 
 ### Descripción
 
-Nuevo proyecto interno de Savia Salud EPS. Punto de partida: análisis descriptivo en Power BI (conteo de afiliados por municipio, IPS y grupo etario). Objetivo: evolucionar a un **modelo predictivo geoespacial** + **dashboard Next.js publicado en Vercel**.
+Proyecto interno de Savia Salud EPS. Punto de partida: análisis descriptivo en Power BI. Objetivo: modelo predictivo geoespacial + dashboard Next.js publicado en Vercel.
 
 ### Avance por Fase
 
 | Fase | Nombre | Estado | Avance |
 |---|---|---|---|
-| **0** | EDA Geoespacial | 🔄 En progreso | 0% |
-| **1** | Ingeniería de Features Geoespaciales | ⏳ Pendiente | 0% |
-| **2** | Modelo Predictivo Geoespacial (XGBoost) | ⏳ Pendiente | 0% |
+| **0** | EDA Geoespacial | ✅ Completada | 100% |
+| **1** | Ingeniería de Features Geoespaciales | ✅ Completada | 100% |
+| **2** | Modelo Predictivo Geoespacial (XGBoost) | ✅ Completada | 100% |
 | **3** | API Backend FastAPI | ⏳ Pendiente | 0% |
-| **4** | Dashboard Next.js + Vercel | ⏳ Pendiente | 0% |
+| **4** | Dashboard Next.js + Vercel | 🔄 En progreso | 40% |
+
+### Estado Fase 2 — Evolución del Modelo XGBoost
+
+| Versión | Fecha | AUC-ROC | Recall Glosada | Precision Glosada | F1-macro | Artefacto |
+|---|---|---|---|---|---|---|
+| v1 | 2026-04-20 | 0.621 | 0.000 | — | 0.323 | `20260420_geo_xgboost_v1.json` |
+| v2 | 2026-05-05 | 0.568 | 0.999 | 5.6% | 0.035 | `20260505_geo_xgboost_v2.json` |
+| v3 | 2026-05-05 | 0.546 | 0.974 | 5.7% | 0.073 | `20260505_geo_xgboost_v3.json` |
+| v4 | 2026-05-05 | 0.604 | 0.995 | 12.8% | 0.082 | `20260505_geo_xgboost_v4.json` |
+| **v5** | **2026-05-06** | **0.674** | **1.000** | **33.9%** | **0.169** | `20260506_geo_xgboost_v5.json` |
+
+**v5 es el modelo en producción actual.**
+
+#### Historia de mejoras
+- **v1→v2:** `scale_pos_weight` ignorado en multiclase → corregido con `sample_weight` explícito + umbral F-beta=2
+- **v2→v3:** Añadidas features temporales (`dia_semana`, `semana_anio`) y `glosa_rate_region`
+- **v3→v4:** `dias_desde_inicio` dominaba SHAP (42%) — sesgo de rezago de auditoría. Filtro madurez ≥30 días elimina 2.76M facturas no auditadas. Features temporales contaminadas eliminadas. SHAP limpio: edad(19.7%), glosa_rate_municipio(16.1%)
+- **v4→v5:** Dataset ampliado a 6 meses (6.28M facturas maduras). Precision Glosada sube 12.8%→33.9% (+21pp). AUC sube 0.604→0.674
+
+#### Hallazgos importantes de datos
+- **`codigo_dx` en `cm_detalles`:** La columna existe pero está prácticamente vacía en la BD (solo 1 registro con valor). No es un bug de SQL — el sistema no está cargando diagnósticos CIE-10 en esta tabla. Feature descartada hasta que se resuelva en origen.
+- **Coordenadas GPS:** Solo 1.9% de afiliados tiene GPS propio; 98.1% usa centroide del municipio como fallback.
+- **127 municipios** activos con datos en el período analizado.
+- **SHAP v5:** `mes_radicacion` domina (pendiente investigar si es estacionalidad real o sesgo residual del split temporal), seguido de `glosa_rate_municipio` y `glosa_rate_region`.
+
+### Estado Fase 4 — Dashboard Next.js
+
+- **Tecnología:** Next.js 14 (App Router) + TypeScript + Tailwind CSS + Recharts
+- **Ubicación:** `dashboard-next/`
+- **Node.js:** Instalado en `C:\Users\jcardonr\node-v20.19.0-win-x64\` (NO está en PATH por defecto — agregar manualmente)
+- **Páginas implementadas:** `/` (resumen ejecutivo), `/features` (SHAP), `/modelo` (evolución v1→v5)
+- **Datos:** Estáticos en `dashboard-next/src/lib/modelData.ts` — en Fase 3 vendrán del API FastAPI
+- **Para levantar localmente:**
+  ```powershell
+  $env:PATH = "C:\Users\jcardonr\node-v20.19.0-win-x64;$env:PATH"
+  cd dashboard-next
+  npm run dev
+  ```
 
 ### Próximos Pasos Inmediatos
 
-1. **Fase 0:** Ejecutar notebook `notebooks/00_eda_geoespacial.ipynb` — extracción y calidad de datos geoespaciales
-2. **Fase 1:** Construir `src/data/geo_features.py` con features Haversine, densidad IPS, tasa glosa por municipio
+1. **Investigar `mes_radicacion` en SHAP v5** — graficar glosa_rate por mes para confirmar si es estacionalidad real
+2. **Fase 3:** Construir `src/api/geo_endpoints.py` con FastAPI
+3. **Fase 4:** Completar páginas del dashboard (mapa de riesgo, predicción, prestadores) y publicar en Vercel
 
 ---
 
